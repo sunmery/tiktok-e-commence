@@ -6,8 +6,9 @@ import (
 	"backend/pkg/token"
 	"context"
 	"errors"
-	"github.com/jackc/pgx/v5"
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func (u *userRepo) CreateAddress(ctx context.Context, req *biz.Address) (*biz.Address, error) {

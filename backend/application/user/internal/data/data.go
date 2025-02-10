@@ -8,6 +8,7 @@ import (
 	"backend/constants"
 	"context"
 	"fmt"
+
 	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
