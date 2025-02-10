@@ -1,7 +1,9 @@
 package server
 
 import (
+	v1 "backend/api/order/v1"
 	"backend/application/order/internal/conf"
+	"backend/application/order/internal/service"
 	"context"
 	"fmt"
 
@@ -22,6 +24,7 @@ import (
 func NewHTTPServer(c *conf.Server,
 
 	ac *conf.Auth,
+	order *service.OrderService,
 	obs *conf.Observability,
 	logger log.Logger,
 ) *http.Server {
@@ -96,7 +99,7 @@ func NewHTTPServer(c *conf.Server,
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	// v1.RegisterUserServiceHTTPServer(srv, user)
+	v1.RegisterOrderServiceHTTPServer(srv, order)
 	return srv
 }
 

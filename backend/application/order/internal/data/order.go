@@ -4,8 +4,9 @@ import (
 	"backend/application/order/internal/biz"
 	"backend/application/order/internal/data/models"
 	"backend/application/order/pkg/convert"
-	"backend/application/order/pkg/token"
 	"context"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*biz.PlaceOrderResp, error) {
@@ -51,16 +52,23 @@ func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*bi
 	}, nil
 }
 
-func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*biz.ListOrderResp, error) {
-	// 提取 payload
-	payload, err := token.ExtractPayload(ctx)
-	if err != nil {
-		return nil, err
-	}
+// func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*biz.ListOrderResp, error) {
+// 	// 提取 payload
+// 	payload, err := token.ExtractPayload(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// 调用数据库查询
-	dbOrders, err := o.data.db.ListOrders(ctx, ListOrdersParams{
-		Owner: payload.Owner,
-		Name:  req.Name,
-	})
+// 	// 调用数据库查询
+// 	dbOrders, err := o.data.db.ListOrders(ctx, ListOrdersParams{
+// 		Owner: payload.Owner,
+// 		Name:  req.Name,
+// 	})
+// }
+
+func NewOrderrRepo(data *Data, logger log.Logger) biz.OrderRepo {
+	return &orderRepo{
+		data: data,
+		log:  log.NewHelper(logger),
+	}
 }

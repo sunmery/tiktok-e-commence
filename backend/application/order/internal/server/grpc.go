@@ -1,7 +1,9 @@
 package server
 
 import (
+	v1 "backend/api/order/v1"
 	"backend/application/order/internal/conf"
+	"backend/application/order/internal/service"
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -17,6 +19,7 @@ func NewGRPCServer(
 
 	c *conf.Server,
 	obs *conf.Observability,
+	order *service.OrderService,
 	logger log.Logger,
 ) *grpc.Server {
 	// trace start
@@ -67,7 +70,7 @@ func NewGRPCServer(
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	// v1.RegisterUserServiceServer(srv, user)
+	v1.RegisterOrderServiceServer(srv, order)
 
 	return srv
 }

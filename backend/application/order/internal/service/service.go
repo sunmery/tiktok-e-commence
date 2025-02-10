@@ -8,7 +8,7 @@ import (
 )
 
 // ProviderSet is service providers.
-var ProviderSet = wire.NewSet()
+var ProviderSet = wire.NewSet(NewOrderService)
 
 type OrderService struct {
 	orderv1.UnimplementedOrderServiceServer
@@ -16,6 +16,6 @@ type OrderService struct {
 	oc *biz.OrderUsecase
 }
 
-func NewUOrderService(oc *biz.OrderUsecase) *OrderService {
+func NewOrderService(oc *biz.OrderUsecase) *OrderService {
 	return &OrderService{oc: oc}
 }
