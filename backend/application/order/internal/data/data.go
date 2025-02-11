@@ -1,6 +1,7 @@
 package data
 
 import (
+	"backend/application/order/internal/biz"
 	"backend/application/order/internal/conf"
 	"backend/application/order/internal/data/models"
 	"context"
@@ -20,11 +21,6 @@ type Data struct {
 	db  *models.Queries
 	rdb *redis.Client
 	cs  *casdoorsdk.Client
-}
-
-type orderRepo struct {
-	data *Data
-	log  *log.Helper
 }
 
 // NewData .
@@ -79,4 +75,14 @@ func NewCasdoor(cc *conf.Auth) *casdoorsdk.Client {
 	)
 
 	return client
+}
+
+type orderRepo struct {
+	data *Data
+	log  *log.Helper
+}
+
+// ListOrder implements biz.OrderRepo.
+func (o *orderRepo) ListOrder(ctx context.Context, req *biz.ListOrderReq) (*biz.ListOrderResp, error) {
+	panic("unimplemented")
 }
