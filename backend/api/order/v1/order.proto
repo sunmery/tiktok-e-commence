@@ -31,28 +31,25 @@ message Address {
   string city = 2;
   string state = 3;
   string country = 4;
-  string zip_code = 5;
-}
-
-message OrderItem {
-  int32 id = 1;
-  string name = 2;
-  string description = 3;
-  float price = 4;
-  int32 quantity = 5;
+  int32 zip_code = 5;
 }
 
 message PlaceOrderReq {
-  string name = 1;
+  uint32 user_id = 1;
   string user_currency = 2;
+
   Address address = 3;
   string email = 4;
-  repeated OrderItem items = 5;
-  string owner = 6;
+  repeated OrderItem order_items = 5;
+}
+
+message OrderItem {
+  cart.CartItem item = 1;
+  float cost = 2;
 }
 
 message OrderResult {
-  int32 order_id = 1;
+  string order_id = 1;
 }
 
 message PlaceOrderResp {

@@ -20,7 +20,6 @@ INSERT INTO orders.order_items(order_id, product_id, name, quantity, price)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
-
 -- name: ListOrderItems :many
 SELECT * FROM orders.order_items
 WHERE order_id = @order_id;
