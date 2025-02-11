@@ -1,12 +1,13 @@
 package biz
 
 type PlaceOrderReq struct {
+	OrderId      int32   // 订单ID
 	Name         string  // 订单名称
+	UserId       uint32  // 用户ID
 	UserCurrency string  // 货币类型
 	Address      Address // 地址信息
 	Items        []Item  // 商品列表
 	Email        string  // 用户邮箱
-	Owner        string  // 订单所有者
 }
 
 type Address struct {
@@ -16,7 +17,6 @@ type Address struct {
 	Country       string // 国家
 	ZipCode       string // 邮政编码
 }
-
 type Item struct {
 	Id          int32   // 商品ID
 	Name        string  // 商品名称
@@ -32,27 +32,24 @@ type PlaceOrderResp struct {
 type OrderResult struct {
 	OrderId int32 // 订单ID
 }
-
 type ListOrderReq struct {
-	UserId string // 用户ID，用于查询该用户的所有订单
+	UserId uint32 `json:"user_id"` // 用户ID
 }
 
 type ListOrderResp struct {
 	Orders []OrderSummary // 订单列表
 }
 
+// 修改后的 biz.OrderSummary 结构体
 type OrderSummary struct {
-	OrderId      string  // 订单ID
-	OrderName    string  // 订单名称
-	OrderStatus  string  // 订单状态: pending, paid, shipped, etc.
-	CreatedAt    int32   // 创建时间，使用字符串或时间戳，具体依据需求
-	TotalAmount  float32 // 订单总金额
-	Address      Address // 确保这里有 Address 字段
-	UserId       uint32  // 订单所有者的用户ID
-	UserCurrency string  // 货币类型
-	Email        string  // 用户邮箱
-	State        string  // 订单状态
-	OrderItems   []OrderItem
+	OrderId      int32       // 订单 ID
+	Status       string      // 订单状态
+	CreatedAt    int64       // 创建时间（Unix 时间戳）
+	Address      Address     // 地址
+	Email        string      // 用户邮箱
+	UserId       uint32      // 用户 ID
+	UserCurrency string      // 用户货币类型
+	OrderItems   []OrderItem // 订单商品列表
 }
 
 type OrderItem struct {
@@ -61,4 +58,13 @@ type OrderItem struct {
 	Description string  // 商品描述
 	Price       float32 // 商品单价
 	Quantity    int32   // 商品数量
+}
+
+type MarkOrderPaidReq struct {
+	UserId  uint32 // 用户ID
+	OrderId string // 订单ID
+}
+
+type MarkOrderPaidResp struct {
+	Success bool `json:"success"`
 }

@@ -3,8 +3,10 @@ package service
 import (
 	pb "backend/api/order/v1"
 	"backend/application/order/internal/biz"
+	"backend/application/order/pkg/convert"
 	"backend/application/order/pkg/token"
 	"context"
+	"strconv"
 )
 
 type OrderServiceService struct {
@@ -17,8 +19,15 @@ func NewOrderServiceService() *OrderServiceService {
 }
 
 func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq) (*pb.PlaceOrderResp, error) {
+
 	payload, err := token.ExtractPayload(ctx)
 	if err != nil {
+		return nil, err
+	}
+
+	UserId, err := strconv.ParseUint(payload.ID, 10, 32)
+	if err != nil {
+		// 处理转换错误，例如返回错误信息给调用者
 		return nil, err
 	}
 
@@ -34,7 +43,7 @@ func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrder
 	}
 
 	result, err := s.oc.PlaceOrder(ctx, &biz.PlaceOrderReq{
-		Name:         payload.Name,
+		UserId:       uint32(UserId),
 		UserCurrency: req.UserCurrency,
 		Address: biz.Address{
 			StreetAddress: req.Address.StreetAddress,
@@ -44,7 +53,6 @@ func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrder
 		},
 		Items: items,
 		Email: req.Email,
-		Owner: payload.Owner,
 	})
 	if err != nil {
 		return nil, err
@@ -58,44 +66,39 @@ func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrder
 
 }
 
-// }
-// func (s *OrderServiceService) ListOrder(ctx context.Context, req *pb.ListOrderReq) (*pb.ListOrderResp, error) {
-// 	payload, err := token.ExtractPayload(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (s *OrderServiceService) ListOrder(ctx context.Context, req *pb.ListOrderReq) (*pb.ListOrderResp, error) {
 
-// 	orders, err := s.oc.ListOrder(ctx, &biz.ListOrderReq{
-// 		UserId: payload.ID,
-// 	})
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	bizResp, err := s.oc.ListOrder(ctx, &biz.ListOrderReq{
+		UserId: uint32(req.UserId),
+	})
+	if err != nil {
+		return nil, err
+	}
 
-// 	// 将 biz.Order 转换为 pb.Order
-// 	var pbOrders []*pb.Order
-// 	for _, order := range orders.Orders {
-// 		pbOrders = append(pbOrders, &pb.Order{
-// 			OrderId:      order.OrderId,
-// 			UserId:       order.UserId,
-// 			UserCurrency: order.UserCurrency,
-// 			Email:        order.Email,
-// 			CreatedAt:    order.CreatedAt,
-// 			OrderItems:   convert.ToPbOrderItems(order.OrderItems),
-// 			Address: &pb.Address{
-// 				StreetAddress: order.Address.StreetAddress,
-// 				City:          order.Address.City,
-// 				State:         order.Address.State,
-// 				ZipCode:       order.Address.ZipCode,
-// 			},
-// 		})
-// 	}
+	var pbOrders []*pb.Order
+	for _, order := range bizResp.Orders {
+		pbOrders = append(pbOrders, &pb.Order{
+			Status:       order.Status,
+			OrderId:      order.OrderId,
+			UserId:       order.UserId,
+			UserCurrency: order.UserCurrency,
+			Email:        order.Email,
+			CreatedAt:    order.CreatedAt,
+			OrderItems:   convert.ToPbOrderItems(order.OrderItems),
+			Address: &pb.Address{
+				StreetAddress: order.Address.StreetAddress,
+				City:          order.Address.City,
+				State:         order.Address.State,
+				ZipCode:       order.Address.ZipCode,
+			},
+		})
+	}
 
-// 	// 返回响应
-// 	return &pb.ListOrderResp{
-// 		Orders: pbOrders,
-// 	}, nil
-// }
+	// 返回响应
+	return &pb.ListOrderResp{
+		Orders: pbOrders,
+	}, nil
+}
 
 // func (s *OrderServiceService) MarkOrderPaid(ctx context.Context, req *pb.MarkOrderPaidReq) (*pb.MarkOrderPaidResp, error) {
 // 	return &pb.MarkOrderPaidResp{}, nil
