@@ -4,6 +4,7 @@ go 1.22.0
 
 require (
 	github.com/casdoor/casdoor-go-sdk v1.3.0
+	github.com/exaring/otelpgx v0.9.0
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-kratos/kratos/contrib/config/consul/v2 v2.0.0-20250127095200-20970020a5ef
@@ -35,7 +36,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
-	github.com/exaring/otelpgx v0.9.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
