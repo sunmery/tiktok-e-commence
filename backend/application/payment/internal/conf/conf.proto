@@ -1,7 +1,7 @@
 syntax = "proto3";
 package kratos.api;
 
-option go_package = "backend/application/payment/internal/conf;conf"; // 生成的包路径
+option go_package = "backend/payment/internal/conf;conf"; // 生成的包路径
 
 import "google/protobuf/duration.proto";
 
@@ -84,7 +84,7 @@ message Observability {
 
   }
   Trace trace = 1;
-  Metric metrics = 2;
+  Metric metric = 2;
   Logging logging = 3;
 }
 
