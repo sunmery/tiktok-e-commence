@@ -6,7 +6,11 @@ import (
 	"backend/application/order/pkg/convert"
 	"backend/application/order/pkg/token"
 	"context"
+	"log"
 	"strconv"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type OrderServiceService struct {
@@ -100,6 +104,26 @@ func (s *OrderServiceService) ListOrder(ctx context.Context, req *pb.ListOrderRe
 	}, nil
 }
 
-// func (s *OrderServiceService) MarkOrderPaid(ctx context.Context, req *pb.MarkOrderPaidReq) (*pb.MarkOrderPaidResp, error) {
-// 	return &pb.MarkOrderPaidResp{}, nil
-// }
+func (s *OrderServiceService) MarkOrderPaid(ctx context.Context, req *pb.MarkOrderPaidReq) (*pb.MarkOrderPaidResp, error) {
+
+	log.Printf("MarkOrderPaid called with OrderId: %s, UserId: %d", req.OrderId, req.UserId)
+
+	if req.OrderId == "" {
+		log.Println("OrderId is empty")
+		return nil, status.Error(codes.InvalidArgument, "订单ID不能为空")
+	}
+
+	_, err := s.oc.MarkOrderPaid(ctx, &biz.MarkOrderPaidReq{
+		UserId:  uint32(req.UserId),
+		OrderId: req.OrderId,
+	})
+
+	if err != nil {
+		log.Printf("MarkOrderPaid failed: %v", err)
+		return nil, status.Error(codes.Internal, "订单支付失败")
+	}
+
+	log.Println("MarkOrderPaid succeeded")
+
+	return &pb.MarkOrderPaidResp{}, nil
+}

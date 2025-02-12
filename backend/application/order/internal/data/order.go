@@ -5,7 +5,10 @@ import (
 	"backend/application/order/internal/data/models"
 	"backend/application/order/pkg/convert"
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -56,7 +59,9 @@ func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*bi
 func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*biz.ListOrderResp, error) {
 
 	// 从数据库获取订单数据
-	dbOrders, err := o.data.db.ListOrders(ctx, models.ListOrdersParams{})
+	dbOrders, err := o.data.db.ListOrders(ctx, models.ListOrdersParams{
+		Owner: fmt.Sprintf("%d", req.UserId),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +89,41 @@ func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*b
 	return []*biz.ListOrderResp{{
 		Orders: orderSummaries,
 	}}, nil
+}
+
+func (o *orderRepo) MarkOrderPaid(ctx context.Context, req *biz.MarkOrderPaidReq) (*biz.MarkOrderPaidResp, error) {
+	// 1. 参数校验
+	if req.OrderId == "" {
+		return nil, errors.New("订单ID不能为空")
+	}
+	if req.UserId == 0 {
+		return nil, errors.New("用户ID不能为空")
+	}
+
+	orderId, err := strconv.ParseInt(req.OrderId, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("无效的订单ID格式: %w", err)
+	}
+
+	// 调用 casdoor 接口标记订单为已支付
+	_, err = o.data.db.MarkOrderPaid(ctx, models.MarkOrderPaidParams{
+		ID:    int32(orderId),
+		Owner: fmt.Sprintf("%d", req.UserId),
+		Name:  "test",
+	})
+
+	if err != nil {
+		// 根据错误类型返回具体的错误信息
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("订单不存在")
+		}
+		return nil, fmt.Errorf("更新订单状态失败: %w", err)
+	}
+
+	return &biz.MarkOrderPaidResp{
+		Success: true,
+	}, nil
+
 }
 
 func NewOrderrRepo(data *Data, logger log.Logger) biz.OrderRepo {
