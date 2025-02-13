@@ -1,11 +1,11 @@
 casdoor:
   server:
     # casdoor url
-    endpoint: "http://localhost:8000"
-    client_id:
-    client_secret:
-    organization:
-    application:
+    endpoint: "http://159.75.231.54:8000"
+    client_id: 
+    client_secret: 
+    organization: tiktok
+    application: ecommerce
 
 jwt:
   certificate: |
