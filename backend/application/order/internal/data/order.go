@@ -92,14 +92,7 @@ func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*b
 }
 
 func (o *orderRepo) MarkOrderPaid(ctx context.Context, req *biz.MarkOrderPaidReq) (*biz.MarkOrderPaidResp, error) {
-	// 1. 参数校验
-	if req.OrderId == "" {
-		return nil, errors.New("订单ID不能为空")
-	}
-	if req.UserId == 0 {
-		return nil, errors.New("用户ID不能为空")
-	}
-
+	// 解析订单ID
 	orderId, err := strconv.ParseInt(req.OrderId, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("无效的订单ID格式: %w", err)
