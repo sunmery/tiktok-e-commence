@@ -1,7 +1,7 @@
 casdoor:
   server:
     # casdoor url
-    endpoint: "http://159.75.231.54:8000"
+    endpoint: "http:#159.75.231.54:8000"
     client_id: 
     client_secret: 
     organization: tiktok
