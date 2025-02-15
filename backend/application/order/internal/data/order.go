@@ -22,7 +22,7 @@ func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*bi
 		StreetAddress: req.Address.StreetAddress,
 		City:          req.Address.City,
 		State:         req.Address.State,
-		ZipCode:       req.Address.ZipCode,
+		ZipCode:       string(req.Address.ZipCode),
 		Currency:      req.UserCurrency,
 	})
 	if err != nil {
@@ -38,7 +38,7 @@ func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*bi
 
 		_, err = o.data.db.CreateOrderItems(ctx, models.CreateOrderItemsParams{
 			OrderID:   orderID,
-			ProductID: item.Id,
+			ProductID: int32(item.Id),
 			Name:      item.Name,
 			Price:     price,
 			Quantity:  item.Quantity,
@@ -56,7 +56,7 @@ func (o *orderRepo) PlaceOrder(ctx context.Context, req *biz.PlaceOrderReq) (*bi
 	}, nil
 }
 
-func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*biz.ListOrderResp, error) {
+func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) (*biz.ListOrderResp, error) {
 
 	// 从数据库获取订单数据
 	dbOrders, err := o.data.db.ListOrders(ctx, models.ListOrdersParams{
@@ -70,14 +70,14 @@ func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*b
 	var orderSummaries []biz.OrderSummary
 	for _, dbOrder := range dbOrders {
 		orderSummaries = append(orderSummaries, biz.OrderSummary{
-			OrderId:   dbOrder.ID,
-			CreatedAt: dbOrder.CreatedAt.Unix(),
+			OrderId:   string(dbOrder.ID),
+			CreatedAt: int32(dbOrder.CreatedAt.Unix()),
 			Address: biz.Address{ // 假设 dbOrder 包含了地址信息
 				StreetAddress: dbOrder.StreetAddress,
 				City:          dbOrder.City,
 				State:         dbOrder.State,
 				Country:       dbOrder.Country,
-				ZipCode:       dbOrder.ZipCode,
+				ZipCode:       int32(dbOrder.ZipCode),
 			},
 			Status:       dbOrder.Status,
 			UserCurrency: dbOrder.Currency,
@@ -86,9 +86,10 @@ func (o *orderRepo) ListOrders(ctx context.Context, req *biz.ListOrderReq) ([]*b
 	}
 
 	// 返回包含订单列表的响应
-	return []*biz.ListOrderResp{{
+	return &biz.ListOrderResp{
 		Orders: orderSummaries,
-	}}, nil
+	}, nil
+
 }
 
 func (o *orderRepo) MarkOrderPaid(ctx context.Context, req *biz.MarkOrderPaidReq) (*biz.MarkOrderPaidResp, error) {

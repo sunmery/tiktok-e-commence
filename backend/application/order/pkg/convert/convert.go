@@ -12,15 +12,15 @@ func ToPbOrderItems(items []biz.OrderItem) []*pb.OrderItem {
 	var pbItems []*pb.OrderItem
 	for _, item := range items {
 		pbItems = append(pbItems, &pb.OrderItem{
-			Id:          item.Id,
-			Name:        item.Name,
-			Description: item.Description,
-			Price:       item.Price,
-			Quantity:    item.Quantity,
+			Item: &pb.CartItem{
+				ProductId: uint32(item.Id), // 传递商品ID
+				Quantity:  item.Quantity,   // 传递商品数量
+			},
 		})
 	}
 	return pbItems
 }
+
 func Float32ToNumeric(value float32) (pgtype.Numeric, error) {
 	var numeric pgtype.Numeric
 	// 使用 Scan 方法将 float64 转换为 pgtype.Numeric

@@ -15,7 +15,7 @@ type Address struct {
 	City          string // 城市
 	State         string // 州/省
 	Country       string // 国家
-	ZipCode       string // 邮政编码
+	ZipCode       int32  // 邮政编码
 }
 type Item struct {
 	Id          int32   // 商品ID
@@ -42,9 +42,9 @@ type ListOrderResp struct {
 
 // 修改后的 biz.OrderSummary 结构体
 type OrderSummary struct {
-	OrderId      int32       // 订单 ID
+	OrderId      string      // 订单 ID
 	Status       string      // 订单状态
-	CreatedAt    int64       // 创建时间（Unix 时间戳）
+	CreatedAt    int32       // 创建时间（Unix 时间戳）
 	Address      Address     // 地址
 	Email        string      // 用户邮箱
 	UserId       uint32      // 用户 ID

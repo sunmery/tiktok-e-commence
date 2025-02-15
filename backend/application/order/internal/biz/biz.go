@@ -18,7 +18,7 @@ var ProviderSet = wire.NewSet(NewOrderUsecase)
 type OrderRepo interface {
 	//订单接口
 	PlaceOrder(ctx context.Context, req *PlaceOrderReq) (*PlaceOrderResp, error)
-	ListOrder(ctx context.Context, req *ListOrderReq) (*ListOrderResp, error)
+	ListOrders(ctx context.Context, req *ListOrderReq) (*ListOrderResp, error)
 	MarkOrderPaid(ctx context.Context, req *MarkOrderPaidReq) (*MarkOrderPaidResp, error)
 }
 
@@ -31,8 +31,8 @@ func (oo *OrderUsecase) PlaceOrder(ctx context.Context, req *PlaceOrderReq) (*Pl
 	return oo.repo.PlaceOrder(ctx, req)
 }
 
-func (oo *OrderUsecase) ListOrder(ctx context.Context, req *ListOrderReq) (*ListOrderResp, error) {
-	return oo.repo.ListOrder(ctx, req)
+func (oo *OrderUsecase) ListOrders(ctx context.Context, req *ListOrderReq) (*ListOrderResp, error) {
+	return oo.repo.ListOrders(ctx, req)
 }
 
 func (oo *OrderUsecase) MarkOrderPaid(ctx context.Context, req *MarkOrderPaidReq) (*MarkOrderPaidResp, error) {
