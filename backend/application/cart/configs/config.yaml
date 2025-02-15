@@ -8,7 +8,7 @@ server:
 data:
   database:
     driver: postgres
-    source: postgresql://postgres:postgres@localhost:5432/database?sslmode=disable&timezone=Asia/Shanghai
+    source: postgresql://root:secret@localhost:5432/ecommerce?sslmode=disable&timezone=Asia/Shanghai
 
   cache:
     addr: localhost:6379

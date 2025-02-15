@@ -3,12 +3,13 @@ package pkg
 import (
 	"flag"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/go-kratos/kratos/contrib/config/consul/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hashicorp/consul/api"
-	"os"
-	"time"
 )
 
 type ConfigCenter struct {

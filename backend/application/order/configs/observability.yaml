@@ -4,9 +4,9 @@
 trace:
   service_name: "organization-application-version"
   grpc:
-    endpoint: 159.75.231.54:4317
+    endpoint: localhost:4317
   http:
-    endpoint: 159.75.231.54:4318
+    endpoint: localhost:4318
 
 ## 日志
 logging:
