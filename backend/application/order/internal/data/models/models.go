@@ -28,7 +28,7 @@ type OrdersOrders struct {
 	City          string    `json:"city"`
 	State         string    `json:"state"`
 	Country       string    `json:"country"`
-	ZipCode       string    `json:"zipCode"`
+	ZipCode       int32     `json:"zipCode"`
 	Currency      string    `json:"currency"`
 	Status        string    `json:"status"`
 	CreatedAt     time.Time `json:"createdAt"`
