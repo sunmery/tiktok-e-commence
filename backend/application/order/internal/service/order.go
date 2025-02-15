@@ -1,6 +1,7 @@
 package service
 
 import (
+	v1 "backend/api/cart/v1"
 	pb "backend/api/order/v1"
 	"backend/application/order/internal/biz"
 	"backend/application/order/pkg/convert"
@@ -15,34 +16,44 @@ import (
 
 type OrderServiceService struct {
 	pb.UnimplementedOrderServiceServer
-	oc *biz.OrderUsecase
+	oc         *biz.OrderUsecase
+	CartClient v1.CartServiceClient // 引入购物车服务的客户端
 }
 
-func NewOrderServiceService() *OrderServiceService {
-	return &OrderServiceService{}
+func NewOrderServiceService(cartClient v1.CartServiceClient) *OrderServiceService {
+	return &OrderServiceService{
+		CartClient: cartClient,
+	}
 }
 
-func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq) (*pb.PlaceOrderResp, error) {
+func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq, userID string) (*pb.PlaceOrderResp, error) {
 
 	payload, err := token.ExtractPayload(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	//调用购物车服务
+	CartResp, err := s.CartClient.GetCart(ctx, &v1.GetCartReq{
+		Owner: userID,
+		//Name:  req.Name,
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, "获取购物车失败")
+	}
+
 	UserId, err := strconv.ParseUint(payload.ID, 10, 32)
 	if err != nil {
 		// 处理转换错误，例如返回错误信息给调用者
-		return nil, err
+		return nil, status.Error(codes.Internal, "用户ID转换失败")
 	}
 
 	var items []biz.Item
-	for _, item := range req.Items {
+	for _, cartItem := range CartResp.Cart.Items {
 		items = append(items, biz.Item{
-			Id:          item.Id,
-			Name:        item.Name,
-			Description: item.Description,
-			Price:       item.Price,
-			Quantity:    item.Quantity,
+			Id:       int32(cartItem.ProductId),
+			Quantity: cartItem.Quantity,
 		})
 	}
 
@@ -64,16 +75,16 @@ func (s *OrderServiceService) PlaceOrder(ctx context.Context, req *pb.PlaceOrder
 
 	return &pb.PlaceOrderResp{
 		Order: &pb.OrderResult{
-			OrderId: result.Order.OrderId,
+			OrderId: string(result.Order.OrderId),
 		},
 	}, nil
 
 }
 
-func (s *OrderServiceService) ListOrder(ctx context.Context, req *pb.ListOrderReq) (*pb.ListOrderResp, error) {
+func (s *OrderServiceService) ListOrders(ctx context.Context, req *pb.ListOrderReq) (*pb.ListOrderResp, error) {
 
-	bizResp, err := s.oc.ListOrder(ctx, &biz.ListOrderReq{
-		UserId: uint32(req.UserId),
+	bizResp, err := s.oc.ListOrders(ctx, &biz.ListOrderReq{
+		UserId: req.UserId,
 	})
 	if err != nil {
 		return nil, err
@@ -82,7 +93,6 @@ func (s *OrderServiceService) ListOrder(ctx context.Context, req *pb.ListOrderRe
 	var pbOrders []*pb.Order
 	for _, order := range bizResp.Orders {
 		pbOrders = append(pbOrders, &pb.Order{
-			Status:       order.Status,
 			OrderId:      order.OrderId,
 			UserId:       order.UserId,
 			UserCurrency: order.UserCurrency,
