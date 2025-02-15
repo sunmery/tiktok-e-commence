@@ -26,11 +26,19 @@ import (
 func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, consul *conf.Consul,  observability *conf.Observability, logger log.Logger) (*kratos.App, func(), error) {
 	pool := data.NewDB(confData)
 	client := data.NewCache(confData)
-	casdoorsdkClient := data.NewCasdoor(auth)
-	dataData, cleanup, err := data.NewData(pool, client, casdoorsdkClient, logger)
+	//casdoorsdkClient := data.NewCasdoor(auth)
+	discovery, err := data.NewDiscovery(consul)
+
+	cartServiceClient, err := data.NewCartServiceClient(discovery, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	dataData, cleanup, err := data.NewData(pool, client, cartServiceClient, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	
 	userRepo := data.NewOrderrRepo(dataData, logger)
 	userUsecase := biz.NewOrderUsecase(userRepo, logger)
 	userService := service.NewOrderService(userUsecase)
